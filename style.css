@@ -1,196 +1,670 @@
-/* =========================================
-   More Info Modal (Netflix Style)
-   ========================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
 
-/* Backdrop overlay with blur */
+body {
+  background-color: #141414;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Screen Transitions */
+.screen {
+  display: none;
+  width: 100vw;
+  min-height: 100vh;
+}
+
+.screen.active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 1. Splash Screen */
+#screen-splash {
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #000;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+.netflix-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3.5rem, 12vw, 5.5rem);
+  letter-spacing: 4px;
+  color: #E50914;
+  text-align: center;
+  animation: zoomGlow 1.2s ease-out forwards;
+}
+
+.tap-hint {
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
+  margin-top: 1.2rem;
+  letter-spacing: 1px;
+}
+
+@keyframes zoomGlow {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1.03); opacity: 1; }
+}
+
+/* 2. Profile Selection */
+#screen-profiles {
+  align-items: center;
+  justify-content: center;
+  background: #141414;
+  position: relative;
+  padding: 4rem 1.5rem 2rem;
+  min-height: 100vh;
+}
+
+.profiles-container {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profiles-container h1 {
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+.avatar-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem 1rem;
+  justify-items: center;
+  width: 100%;
+  max-width: 480px;
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.profile-card:active,
+.profile-card:hover {
+  transform: scale(1.05);
+}
+
+.avatar {
+  width: clamp(75px, 20vw, 110px);
+  height: clamp(75px, 20vw, 110px);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.avatar .face {
+  font-size: clamp(1.8rem, 5vw, 2.4rem);
+  color: #fff;
+  font-weight: bold;
+}
+
+.avatar.blue { background-color: #0376d8; }
+.avatar.red { background-color: #e50914; }
+.avatar.yellow { background-color: #e5a409; }
+.avatar.purple { background-color: #8c25aa; }
+
+.avatar.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-card.target {
+  border: 2px solid transparent;
+}
+
+.profile-card.target:hover,
+.profile-card.target:active {
+  border-color: #fff;
+  border-radius: 8px;
+}
+
+.profile-card p {
+  color: #999;
+  font-size: 0.85rem;
+  letter-spacing: 1.2px;
+  font-weight: 500;
+}
+
+/* Floating Hearts Animation */
+.floating-heart {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  user-select: none;
+  animation: floatUpBurst 1.2s ease-out forwards;
+}
+
+@keyframes floatUpBurst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.6) rotate(0deg);
+  }
+  50% { opacity: 0.9; }
+  100% {
+    opacity: 0;
+    transform: translate(var(--drift-x), var(--drift-y)) scale(1.6) rotate(var(--rot));
+  }
+}
+
+/* 3. Browse Dashboard (Mobile Default) */
+#screen-browse {
+  background: #141414;
+  padding-bottom: 75px;
+}
+
+.netflix-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1.2rem;
+  background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, transparent 100%);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.nav-left {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-left .brand {
+  font-family: 'Bebas Neue', sans-serif;
+  color: #E50914;
+  font-size: 2rem;
+  letter-spacing: 1.5px;
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: bold;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.profile-top-back {
+  position: absolute;
+  top: 1.2rem;
+  left: 1.2rem;
+}
+
+/* Hero Banner Stacking */
+.hero-banner {
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 1rem 1.2rem 2rem;
+  gap: 1.5rem;
+}
+
+.hero-image {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-image img {
+  width: 100%;
+  max-width: 500px;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+  transition: opacity 0.25s ease;
+}
+
+.hero-content {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.top10-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.top10-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  width: 24px;
+  height: 24px;
+  background: #e50914;
+  color: #fff;
+  font-weight: 900;
+  border-radius: 3px;
+  padding: 1px;
+}
+
+.top10-badge .top-txt { font-size: 0.45rem; }
+.top10-badge .num-txt { font-size: 0.85rem; font-family: 'Bebas Neue', sans-serif; }
+
+.top10-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.hero-title {
+  font-size: clamp(1.4rem, 5vw, 2.2rem);
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  line-height: 1.2;
+}
+
+.metadata-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+}
+
+.match-score { color: #46d369; font-weight: bold; }
+
+.age-badge, .quality-badge {
+  border: 1px solid rgba(255,255,255,0.4);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
+.season-badge { color: #fff; font-weight: 500; }
+
+.hero-desc {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #cccccc;
+  margin-bottom: 1.2rem;
+  min-height: 60px;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 0.8rem;
+  width: 100%;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.btn-white { background: #fff; color: #000; }
+.btn-gray { background: rgba(109, 109, 110, 0.7); color: #fff; }
+
+/* Touch-Scrollable Row Posters */
+.content-row {
+  padding: 1rem 1.2rem 2rem;
+}
+
+.content-row h3 {
+  font-size: 1.15rem;
+  margin-bottom: 0.8rem;
+}
+
+.row-posters {
+  display: flex;
+  gap: 0.8rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.5rem;
+}
+
+.row-posters::-webkit-scrollbar {
+  display: none;
+}
+
+.poster {
+  flex: 0 0 160px;
+  scroll-snap-align: start;
+  cursor: pointer;
+}
+
+.poster img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  display: block;
+}
+
+.poster.active-memory img {
+  border-color: #e50914;
+}
+
+.poster-caption {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: #aaa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Mobile Bottom Navigation Bar */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: rgba(18, 18, 18, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  color: #888;
+  font-size: 0.7rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.bottom-nav-item.active {
+  color: #fff;
+}
+
+.bottom-nav-item span.icon {
+  font-size: 1.2rem;
+}
+
+/* Footer */
+.netflix-footer {
+  padding: 1.5rem 1.2rem 2rem;
+  color: #757575;
+  font-size: 0.8rem;
+}
+
+.footer-heading {
+  margin-bottom: 1rem;
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.footer-links-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.footer-link {
+  color: #757575;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.footer-link .link-title {
+  font-size: 0.78rem;
+  color: #aaa;
+  display: block;
+}
+
+.footer-link .link-sub {
+  font-size: 0.7rem;
+  color: #666;
+  font-style: italic;
+}
+
+.service-code-btn {
+  background: transparent;
+  border: 1px solid #757575;
+  color: #757575;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+
+.service-code-val {
+  display: none;
+  color: #46d369;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.footer-copyright {
+  font-size: 0.7rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* Fullscreen Video Player */
+#screen-player {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 99999;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#screen-player.active {
+  display: flex;
+}
+
+.player-back-wrapper {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 100000;
+}
+
+.player-back-btn {
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.video-viewport {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-viewport video {
+  width: 100%;
+  max-height: 90vh;
+  outline: none;
+}
+
+/* Modal Bottom-Sheet for Mobile */
 .modal-backdrop {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(8px);
   z-index: 2000;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
 }
 
-/* Open state triggers flex display & full opacity */
 .modal-backdrop.open {
   display: flex;
-  opacity: 1;
 }
 
-/* Modal dialog card */
 .modal-card {
   background: #181818;
-  width: 90%;
+  width: 100%;
   max-width: 550px;
-  border-radius: 10px;
-  padding: 2.2rem;
+  border-radius: 16px 16px 0 0;
+  padding: 1.8rem 1.4rem 2.2rem;
   position: relative;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transform: translateY(30px);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  max-height: 85vh;
+  overflow-y: auto;
 }
 
-.modal-backdrop.open .modal-card {
-  transform: translateY(0);
-}
-
-/* Circular close button */
 .modal-close-btn {
   position: absolute;
-  top: 1.2rem;
-  right: 1.2rem;
+  top: 1rem;
+  right: 1rem;
   background: #2a2a2a;
   border: none;
   color: #fff;
-  font-size: 1.1rem;
-  width: 34px;
-  height: 34px;
+  font-size: 1rem;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s, transform 0.2s;
 }
 
-.modal-close-btn:hover {
-  background: #e50914;
-  transform: scale(1.1);
-}
-
-/* Header & Badges */
 .modal-header h2 {
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
+  padding-right: 2rem;
 }
 
-.modal-badges {
-  margin-bottom: 1.5rem;
-}
-
-/* Romantic Quote Box */
 .modal-quote {
-  font-size: 1.1rem;
-  line-height: 1.6;
+  font-size: 0.95rem;
+  line-height: 1.5;
   color: #e5e5e5;
   font-style: italic;
   border-left: 3px solid #e50914;
-  padding-left: 1rem;
-  margin-bottom: 1.8rem;
+  padding-left: 0.8rem;
+  margin: 1.2rem 0;
 }
 
-/* Metadata / Details List */
 .modal-details p {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: #ddd;
-  margin-bottom: 0.6rem;
-  line-height: 1.5;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
 }
 
 .detail-label {
   color: #777;
   font-weight: 500;
-  margin-right: 0.4rem;
+  margin-right: 0.3rem;
 }
-/* =====================================
-   MOBILE RESPONSIVE FIXES (Screens <= 768px)
-   ===================================== */
-@media (max-width: 768px) {
-  /* 1. Header & Navigation */
-  header, 
-  nav, 
-  .navbar {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    padding: 10px 15px !important;
-    flex-wrap: wrap !important;
-  }
 
-  /* 2. Stack the Hero / Birthday banner vertically */
-  .hero, 
-  .banner, 
-  .main-content, 
-  .content {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    text-align: center !important;
-    padding: 20px 15px !important;
-    width: 100% !important;
+/* Desktop Media Query (Automatically applies on laptops/screens >= 768px) */
+@media (min-width: 768px) {
+  .hero-banner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2rem 4rem;
+    gap: 3rem;
   }
-
-  /* 3. Make the main photo scale nicely across the phone screen */
-  .hero img, 
-  .banner img, 
-  .main-content img,
-  .hero-image,
-  .banner-image {
-    width: 90% !important;
-    max-width: 340px !important;
-    height: auto !important;
-    border-radius: 8px !important;
-    margin: 20px auto !important;
-    display: block !important;
+  .hero-image img {
+    width: 440px;
+    height: 280px;
   }
-
-  /* 4. Adjust typography so it fits mobile screens */
-  h1, 
-  .title, 
-  .hero h1 {
-    font-size: 26px !important;
-    line-height: 1.2 !important;
-    margin-bottom: 12px !important;
+  .hero-buttons {
+    width: auto;
   }
-
-  p, 
-  .description {
-    font-size: 14px !important;
-    line-height: 1.5 !important;
-    padding: 0 10px !important;
-  }
-
-  /* 5. Center Play and More Info buttons */
-  .buttons, 
-  .btn-group, 
-  .actions {
-    display: flex !important;
-    justify-content: center !important;
-    gap: 12px !important;
-    width: 100% !important;
-    margin-top: 15px !important;
-  }
-
-  button, 
   .btn {
-    padding: 10px 20px !important;
-    font-size: 14px !important;
+    flex: initial;
+    padding: 0.6rem 1.6rem;
   }
-
-  /* 6. Netflix carousel / Memories photo rows */
-  .gallery, 
-  .row, 
-  .slider, 
-  .memories {
-    display: flex !important;
-    overflow-x: auto !important;
-    gap: 10px !important;
-    padding: 10px 15px !important;
-    scroll-snap-type: x mandatory;
+  .avatar-row {
+    grid-template-columns: repeat(5, 1fr);
+    max-width: none;
   }
-
-  .gallery img, 
-  .row img, 
-  .memories img {
-    width: 160px !important;
-    height: auto !important;
-    flex-shrink: 0 !important;
+  .mobile-bottom-nav {
+    display: none;
+  }
+  #screen-browse {
+    padding-bottom: 0;
+  }
+  .modal-backdrop {
+    align-items: center;
+  }
+  .modal-card {
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .content-row {
+    padding: 1rem 4rem 2rem;
+  }
+  .poster {
+    flex: 0 0 220px;
+  }
+  .poster img {
+    height: 130px;
+  }
+  .footer-links-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 }
