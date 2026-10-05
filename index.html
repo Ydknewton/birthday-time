@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Netflix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #141414;
+      color: #fff;
+      font-family: 'Roboto', sans-serif;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* Screen Transitions */
+    .screen {
+      display: none;
+      width: 100vw;
+      min-height: 100vh;
+    }
+
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 1. Splash Screen */
+    #screen-splash {
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background-color: #000;
+    }
+
+    .netflix-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5.5rem;
+      letter-spacing: 5px;
+      color: #E50914;
+      text-align: center;
+      animation: zoomGlow 1.2s ease-out forwards;
+    }
+
+    .tap-hint {
+      text-align: center;
+      color: #777;
+      font-size: 0.95rem;
+      margin-top: 1.5rem;
+      letter-spacing: 1px;
+    }
+
+    @keyframes zoomGlow {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1.05); opacity: 1; }
+    }
+
+    /* 2. Profile Selection */
+    #screen-profiles {
+      align-items: center;
+      justify-content: center;
+      background: #141414;
+      position: relative;
+    }
+
+    .profiles-container h1 {
+      font-size: 2.8rem;
+      text-align: center;
+      margin-bottom: 2.5rem;
+      font-weight: 500;
+    }
+
+    .avatar-row {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .profile-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .profile-card:hover {
+      transform: scale(1.08);
+    }
+
+    .avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .avatar .face {
+      font-size: 2.5rem;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .avatar.blue { background-color: #0376d8; }
+    .avatar.red { background-color: #e50914; }
+    .avatar.yellow { background-color: #e5a409; }
+    .avatar.purple { background-color: #8c25aa; }
+
+    .avatar.photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .profile-card.target {
+      border: 2px solid transparent;
+    }
+    .profile-card.target:hover {
+      border-color: #fff;
+      border-radius: 8px;
+    }
+
+    .profile-card p {
+      color: #808080;
+      font-size: 1rem;
+      letter-spacing: 1.5px;
+    }
+
+    /* Floating Hearts Animation */
+    .floating-heart {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      user-select: none;
+      animation: floatUpBurst 1.2s ease-out forwards;
+    }
+
+    @keyframes floatUpBurst {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(0.6) rotate(0deg);
+      }
+      50% {
+        opacity: 0.9;
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--drift-x), var(--drift-y)) scale(1.6) rotate(var(--rot));
+      }
+    }
+
+    /* 3. Browse Dashboard */
+    #screen-browse {
+      background: #141414;
+    }
+
+    .netflix-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 3rem;
+      background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+    }
+
+    .nav-left {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .back-btn:hover {
+      background: #e50914;
+      border-color: #e50914;
+      transform: scale(1.05);
+    }
+
+    .profile-top-back {
+      position: absolute;
+      top: 2rem;
+      left: 2rem;
+    }
+
+    .nav-left .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      color: #E50914;
+      font-size: 2.2rem;
+      letter-spacing: 2px;
+    }
+
+    .nav-left a {
+      color: #e5e5e5;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .hero-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2rem 4rem;
+      gap: 3rem;
+    }
+
+    .hero-content {
+      max-width: 550px;
+    }
+
+    /* Netflix Top 10 Badge */
+    .top10-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .top10-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      width: 28px;
+      height: 28px;
+      background: #e50914;
+      color: #fff;
+      font-weight: 900;
+      border-radius: 3px;
+      padding: 2px;
+    }
+
+    .top10-badge .top-txt {
+      font-size: 0.55rem;
+      letter-spacing: -0.5px;
+    }
+
+    .top10-badge .num-txt {
+      font-size: 1rem;
+      font-family: 'Bebas Neue', sans-serif;
+    }
+
+    .top10-label {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    .hero-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      transition: opacity 0.25s ease;
+    }
+
+    .metadata-row {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1.2rem;
+      font-size: 0.95rem;
+    }
+
+    .match-score {
+      color: #46d369;
+      font-weight: bold;
+    }
+
+    .age-badge, .quality-badge {
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+
+    .season-badge {
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #cccccc;
+      margin-bottom: 1.5rem;
+      min-height: 70px;
+      transition: opacity 0.25s ease;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn {
+      padding: 0.6rem 1.6rem;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover {
+      opacity: 0.8;
+    }
+
+    .btn-white {
+      background: #fff;
+      color: #000;
+    }
+
+    .btn-gray {
+      background: rgba(109, 109, 110, 0.7);
+      color: #fff;
+    }
+
+    .hero-image img {
+      width: 440px;
+      height: 280px;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      transition: opacity 0.25s ease;
+    }
+
+    .content-row {
+      padding: 1rem 4rem 2rem;
+    }
+
+    .content-row h3 {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .row-posters {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+    }
+
+    .poster {
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .poster img {
+      width: 220px;
+      height: 130px;
+      object-fit: cover;
+      border-radius: 4px;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      border: 2px solid transparent;
+      display: block;
+    }
+
+    .poster:hover img {
+      transform: scale(1.05);
+      border-color: #fff;
+    }
+
+    .poster.active-memory img {
+      border-color: #e50914;
+    }
+
+    .poster-caption {
+      margin-top: 0.4rem;
+      font-size: 0.85rem;
+      color: #aaa;
+      text-align: center;
+    }
+
+    /* Netflix Romantic Footer */
+    .netflix-footer {
+      max-width: 980px;
+      margin: 3rem auto 2.5rem;
+      padding: 0 2rem;
+      color: #757575;
+      font-size: 0.85rem;
+    }
+
+    .footer-heading {
+      margin-bottom: 1.5rem;
+      color: #888;
+      font-size: 0.95rem;
+    }
+
+    .footer-links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem 1.5rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .footer-link {
+      color: #757575;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .footer-link .link-title {
+      font-size: 0.85rem;
+      color: #999;
+    }
+
+    .footer-link .link-sub {
+      font-size: 0.78rem;
+      color: #666;
+      font-style: italic;
+    }
+
+    .footer-link:hover .link-title {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    .footer-link:hover .link-sub {
+      color: #bbb;
+    }
+
+    .service-code-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .service-code-btn {
+      background: transparent;
+      border: 1px solid #757575;
+      color: #757575;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.2s ease;
+    }
+
+    .service-code-btn:hover {
+      color: #fff;
+      border-color: #fff;
+    }
+
+    .service-code-val {
+      display: none;
+      color: #46d369;
+      font-weight: bold;
+      letter-spacing: 1px;
+      font-size: 0.85rem;
+    }
+
+    .footer-copyright {
+      font-size: 0.75rem;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    /* 4. Fullscreen Video Player Screen */
+    #screen-player {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 99999;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #screen-player.active {
+      display: flex;
+    }
+
+    .player-back-wrapper {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      z-index: 100000;
+    }
+
+    .player-back-btn {
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: bold;
+      padding: 0.7rem 1.4rem;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .player-back-btn:hover {
+      background: #e50914;
+      border-color: #e50914;
+      transform: scale(1.05);
+    }
+
+    .video-viewport {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-viewport video {
+      max-width: 90vw;
+      max-height: 85vh;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+      outline: none;
+    }
+
+    /* 5. More Info Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #181818;
+      width: 90%;
+      max-width: 550px;
+      border-radius: 10px;
+      padding: 2.2rem;
+      position: relative;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 1.2rem;
+      right: 1.2rem;
+      background: #2a2a2a;
+      border: none;
+      color: #fff;
+      font-size: 1.1rem;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .modal-close-btn:hover {
+      background: #e50914;
+    }
+
+    .modal-header h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-badges {
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-quote {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #e5e5e5;
+      font-style: italic;
+      border-left: 3px solid #e50914;
+      padding-left: 1rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .modal-details p {
+      font-size: 0.95rem;
+      color: #ddd;
+      margin-bottom: 0.6rem;
+      line-height: 1.5;
+    }
+
+    .detail-label {
+      color: #777;
+      font-weight: 500;
+      margin-right: 0.4rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen 1: Splash / Intro -->
+  <section id="screen-splash" class="screen active">
+    <div class="netflix-logo-anim">
+      <h1 class="netflix-text">NETFLIX</h1>
+      <p class="tap-hint">Tap anywhere to enter</p>
+    </div>
+  </section>
+
+  <!-- Screen 2: Who's Watching -->
+  <section id="screen-profiles" class="screen">
+    <button id="btn-back-to-splash" class="back-btn profile-top-back">← Back</button>
+    <div class="profiles-container">
+      <h1>Who's Watching?</h1>
+      <div class="avatar-row">
+        <div class="profile-card">
+          <div class="avatar blue"><span class="face">:)</span></div>
+          <p>THE</p>
+        </div>
+        <div class="profile-card">
+          <div class="avatar red"><span class="face">:)</span></div>
+          <p>LOVE</p>
+        </div>
+        <!-- Middle Profile with Her Photo and Hearts Burst -->
+        <div class="profile-card target" id="target-profile">
+          <div class="avatar photo">
+            <img src="avatar.jpeg" alt="Her" />
+          </div>
+          <p>OF</p>
+        </div>
+        <div class="profile-card">
+          <div class="avatar yellow"><span class="face">:)</span></div>
+          <p>MY</p>
+        </div>
+        <div class="profile-card">
+          <div class="avatar purple"><span class="face">:)</span></div>
+          <p>LIFE</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 3: Browse / Dashboard -->
+  <section id="screen-browse" class="screen">
+    <nav class="netflix-nav">
+      <div class="nav-left">
+        <button id="btn-back-to-profiles" class="back-btn">← Profiles</button>
+        <span class="brand">NETFLIX</span>
+        <a href="#">Home</a>
+        <a href="#">TV Shows</a>
+        <a href="#">Movies</a>
+        <a href="#">New & Popular</a>
+      </div>
+      <div class="nav-right">
+        <div class="mini-profile"></div>
+      </div>
+    </nav>
+
+    <div class="hero-banner">
+      <div class="hero-content">
+        <!-- Netflix Top 10 Badge -->
+        <div class="top10-wrapper">
+          <div class="top10-badge">
+            <span class="top-txt">TOP</span>
+            <span class="num-txt">10</span>
+          </div>
+          <span class="top10-label">#1 in My Heart Worldwide</span>
+        </div>
+
+        <h2 id="main-hero-title" class="hero-title">HAPPY BIRTHDAY MY LOVE &lt;3</h2>
+        <div class="metadata-row">
+          <span class="match-score">99% Match</span>
+          <span class="age-badge">18+</span>
+          <span class="season-badge">Lifetime Access</span>
+          <span class="quality-badge">Ultra HD</span>
+        </div>
+        <p id="main-hero-desc" class="hero-desc">
+          Wishing you a day filled with love, happiness, and beautiful memories. May this new year bring endless success, peace, and joy. Thank you for being the amazing soul that makes everything brighter.
+        </p>
+        <div class="hero-buttons">
+          <button id="btn-play" class="btn btn-white">▶ Play</button>
+          <button id="btn-more-info" class="btn btn-gray">ⓘ More Info</button>
+        </div>
+      </div>
+      <div class="hero-image">
+        <img id="main-hero-img" src="hero.jpeg" alt="Special memory" />
+      </div>
+    </div>
+
+    <!-- Gallery / Sweet Memories Row (Clickable Slideshow) -->
+    <div class="content-row">
+      <h3>✨ Sweet Memories</h3>
+      <div class="row-posters">
+        
+        <div class="poster active-memory" 
+             data-img="hero.jpeg"
+             data-title="HAPPY BIRTHDAY MY LOVE &lt;3"
+             data-desc="Wishing you a day filled with love, happiness, and beautiful memories. May this new year bring endless success, peace, and joy. Thank you for being the amazing soul that makes everything brighter.">
+          <img src="hero.jpeg" alt="Special Day" />
+          <p class="poster-caption">The Main Feature</p>
+        </div>
+
+        <div class="poster" 
+             data-img="photo1.jpeg"
+             data-title="OUR SECOND ADVENTURE"
+             data-desc="Second birthday together,am proud us not much achieved but we have done alot together and we will continue winning together,happy birthday ml shame ain't in naivasha to celebrate with you,don't let that make your day gloomy though,celebrate..i looove you beiby😍.">
+          <img src="photo1.jpeg" alt="Memory 1" />
+          <p class="poster-caption">Chapter 1: Second Adventure</p>
+        </div>
+
+        <div class="poster" 
+             data-img="photo 2.jpeg"
+             data-title="LATE NIGHT CONVERSATIONS"
+             data-desc="When two in the morning felt like two in the afternoon because we couldn't stop talking about our dreams, secrets, and everything in between.">
+          <img src="photo 2.jpeg" alt="Memory 2" />
+          <p class="poster-caption">Chapter 2: Deep Talks</p>
+        </div>
+
+        <div class="poster" 
+             data-img="photo 3.jpeg"
+             data-title="FEAR 100%,COURAGE 1%"
+             data-desc="Terrified the whole time but still managed to hold it.Now i can lie about visiting mombasa because someone carried me throughout the placement😭😂.">
+          <img src="photo 3.jpeg" alt="Memory 3" />
+          <p class="poster-caption">Chapter 3: Favorite View</p>
+        </div>
+
+        <div class="poster" 
+             data-img="photo 4.jpeg"
+             data-title="TO INFINITY &amp; BEYOND"
+             data-desc="Looking back at how far we have come, and looking forward to every single milestone, anniversary, and adventure waiting ahead for us.">
+          <img src="photo 4.jpeg" alt="Memory 4" />
+          <p class="poster-caption">Chapter 4: The Journey</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Netflix Romantic Footer -->
+    <footer class="netflix-footer">
+      <p class="footer-heading">Questions? Call your boyfriend (Available 24/7 Hotline).</p>
+      
+      <div class="footer-links-grid">
+        <div class="footer-link" onclick="alert('Audio Track: Whispers & forehead kisses on infinite repeat. 🎧❤️')">
+          <span class="link-title">Audio & Subtitles</span>
+          <span class="link-sub">"Whispers & Forehead Kisses"</span>
+        </div>
+
+        <div class="footer-link" onclick="alert('Hotline: Dial your boyfriend anytime. Guaranteed immediate answer and comfort. 📞✨')">
+          <span class="link-title">Help Center</span>
+          <span class="link-sub">"Call Me Anytime (24/7 Hotline)"</span>
+        </div>
+
+        <div class="footer-link" onclick="alert('Redeemable for: Unlimited warm hugs, forehead kisses, and late-night food dates. Never expires! 🎟️')">
+          <span class="link-title">Gift Cards</span>
+          <span class="link-sub">"Unlimited Hugs & Dates Coupon"</span>
+        </div>
+
+        <div class="footer-link" onclick="alert('Clause 1: You must stay cute forever.\nClause 2: No takebacks, you are forever mine. 📜🔒')">
+          <span class="link-title">Terms of Use</span>
+          <span class="link-sub">"No Takebacks, Forever Mine"</span>
+        </div>
+
+        <div class="footer-link" onclick="alert('Top Secret: Every memory, secret, and vulnerable moment is safely guarded only between us. 🤫❤️')">
+          <span class="link-title">Privacy</span>
+          <span class="link-sub">"Only Between Us"</span>
+        </div>
+
+        <div class="footer-link" onclick="alert('Cookie Policy: Only fresh baked warm chocolate cookies and sweet smiles accepted here! 🍪')">
+          <span class="link-title">Cookie Preferences</span>
+          <span class="link-sub">"Fresh Baked Warm Cookies Only"</span>
+        </div>
+      </div>
+
+      <div class="service-code-row">
+        <button id="btn-service-code" class="service-code-btn">Service Code</button>
+        <span id="service-code-display" class="service-code-val">CODE: FOREVER-&-ALWAYS-100% ❤️</span>
+      </div>
+
+      <p class="footer-copyright">
+        © 2026 Our Love Story Inc. • Made with ❤️ exclusively for the most wonderful girl in the world.
+      </p>
+    </footer>
+
+  </section>
+
+  <!-- Screen 4: Fullscreen Player Overlay with Guaranteed Back Button -->
+  <section id="screen-player" class="screen">
+    <div class="player-back-wrapper">
+      <button id="btn-close-player" class="player-back-btn">← Back to Dashboard</button>
+    </div>
+    <div class="video-viewport">
+      <video id="main-video" playsinline controls>
+        <source src="videoo.mp4" type="video/mp4" />
+        Your browser does not support HTML5 MP4 video.
+      </video>
+    </div>
+  </section>
+
+  <!-- More Info Modal Popup -->
+  <div id="info-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <button id="modal-close" class="modal-close-btn">✕</button>
+      <div class="modal-header">
+        <h2>HAPPY BIRTHDAY MY LOVE &lt;3</h2>
+        <div class="metadata-row modal-badges">
+          <span class="match-score">100% Match</span>
+          <span class="age-badge">Forever</span>
+          <span class="season-badge">Season 2026</span>
+          <span class="quality-badge">Ultra HD</span>
+        </div>
+      </div>
+      <div class="modal-body">
+        <p class="modal-quote">
+          "Of all the storylines in the universe, meeting you will always be my absolute favorite plot twist. You make every ordinary day feel extraordinary."
+        </p>
+        <div class="modal-details">
+          <p><span class="detail-label">Cast:</span> You & Me</p>
+          <p><span class="detail-label">Genres:</span> Romantic, Slice of Life, Adventure</p>
+          <p><span class="detail-label">Tags:</span> Heartwarming, Inspiring, Unconditional, Soulmate</p>
+          <p><span class="detail-label">Audio:</span> Laughter, Late Night Talks, Inside Jokes</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Universal screen switcher
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+      const target = document.getElementById(screenId);
+      if (target) {
+        target.classList.add('active');
+      }
+    }
+
+    // 1. Splash -> Profiles
+    document.getElementById('screen-splash').addEventListener('click', () => {
+      showScreen('screen-profiles');
+    });
+
+    // Back from Profiles -> Splash
+    document.getElementById('btn-back-to-splash').addEventListener('click', (e) => {
+      e.stopPropagation();
+      showScreen('screen-splash');
+    });
+
+    // 2. Profile Selection -> Explosion of Floating Hearts -> Dashboard
+    const targetProfile = document.getElementById('target-profile');
+
+    if (targetProfile) {
+      targetProfile.addEventListener('click', () => {
+        const rect = targetProfile.getBoundingClientRect();
+        const originX = rect.left + rect.width / 2;
+        const originY = rect.top + rect.height / 2;
+
+        const heartIcons = ['❤️', '💖', '✨', '💕', '🥰', '💗'];
+
+        for (let i = 0; i < 35; i++) {
+          const heart = document.createElement('span');
+          heart.className = 'floating-heart';
+          heart.textContent = heartIcons[Math.floor(Math.random() * heartIcons.length)];
+
+          const angle = Math.random() * Math.PI * 2;
+          const distance = 80 + Math.random() * 220;
+          const driftX = `${Math.cos(angle) * distance}px`;
+          const driftY = `${Math.sin(angle) * distance - (120 + Math.random() * 160)}px`;
+          const rotation = `${(Math.random() - 0.5) * 60}deg`;
+          const size = `${1.2 + Math.random() * 1.5}rem`;
+
+          heart.style.left = `${originX}px`;
+          heart.style.top = `${originY}px`;
+          heart.style.fontSize = size;
+          heart.style.setProperty('--drift-x', driftX);
+          heart.style.setProperty('--drift-y', driftY);
+          heart.style.setProperty('--rot', rotation);
+
+          document.body.appendChild(heart);
+
+          setTimeout(() => heart.remove(), 1200);
+        }
+
+        setTimeout(() => {
+          showScreen('screen-browse');
+        }, 700);
+      });
+    }
+
+    // Back from Dashboard -> Profiles Screen
+    document.getElementById('btn-back-to-profiles').addEventListener('click', () => {
+      showScreen('screen-profiles');
+    });
+
+    // 3. Interactive Sweet Memories Gallery (Swaps hero image, title, and description)
+    const heroImg = document.getElementById('main-hero-img');
+    const heroTitle = document.getElementById('main-hero-title');
+    const heroDesc = document.getElementById('main-hero-desc');
+    const posters = document.querySelectorAll('.poster');
+
+    posters.forEach(poster => {
+      poster.addEventListener('click', () => {
+        posters.forEach(p => p.classList.remove('active-memory'));
+        poster.classList.add('active-memory');
+
+        heroImg.style.opacity = '0';
+        heroTitle.style.opacity = '0';
+        heroDesc.style.opacity = '0';
+
+        setTimeout(() => {
+          heroImg.src = poster.getAttribute('data-img');
+          heroTitle.innerHTML = poster.getAttribute('data-title');
+          heroDesc.textContent = poster.getAttribute('data-desc');
+
+          heroImg.style.opacity = '1';
+          heroTitle.style.opacity = '1';
+          heroDesc.style.opacity = '1';
+        }, 200);
+      });
+    });
+
+    // 4. Footer Service Code Secret Button
+    const btnServiceCode = document.getElementById('btn-service-code');
+    const serviceCodeDisplay = document.getElementById('service-code-display');
+
+    if (btnServiceCode && serviceCodeDisplay) {
+      btnServiceCode.addEventListener('click', () => {
+        serviceCodeDisplay.style.display = 'inline';
+        btnServiceCode.style.display = 'none';
+      });
+    }
+
+    // 5. More Info Modal
+    const btnMoreInfo = document.getElementById('btn-more-info');
+    const infoModal = document.getElementById('info-modal');
+    const btnModalClose = document.getElementById('modal-close');
+
+    if (btnMoreInfo && infoModal) {
+      btnMoreInfo.addEventListener('click', () => {
+        infoModal.classList.add('open');
+      });
+      btnModalClose.addEventListener('click', () => {
+        infoModal.classList.remove('open');
+      });
+      infoModal.addEventListener('click', (e) => {
+        if (e.target === infoModal) {
+          infoModal.classList.remove('open');
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && infoModal.classList.contains('open')) {
+          infoModal.classList.remove('open');
+        }
+      });
+    }
+
+    // 6. Video Player Controls
+    const video = document.getElementById('main-video');
+    const btnPlay = document.getElementById('btn-play');
+    const btnClose = document.getElementById('btn-close-player');
+
+    if (btnPlay) {
+      btnPlay.addEventListener('click', () => {
+        showScreen('screen-player');
+        if (video) {
+          video.currentTime = 0;
+          video.play().catch(() => {});
+        }
+      });
+    }
+
+    if (btnClose) {
+      btnClose.addEventListener('click', () => {
+        if (video) video.pause();
+        showScreen('screen-browse');
+      });
+    }
+  </script>
+</body>
+</html>

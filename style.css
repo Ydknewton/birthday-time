@@ -1,0 +1,101 @@
+/* =========================================
+   More Info Modal (Netflix Style)
+   ========================================= */
+
+/* Backdrop overlay with blur */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Open state triggers flex display & full opacity */
+.modal-backdrop.open {
+  display: flex;
+  opacity: 1;
+}
+
+/* Modal dialog card */
+.modal-card {
+  background: #181818;
+  width: 90%;
+  max-width: 550px;
+  border-radius: 10px;
+  padding: 2.2rem;
+  position: relative;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: translateY(30px);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-backdrop.open .modal-card {
+  transform: translateY(0);
+}
+
+/* Circular close button */
+.modal-close-btn {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  background: #2a2a2a;
+  border: none;
+  color: #fff;
+  font-size: 1.1rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.modal-close-btn:hover {
+  background: #e50914;
+  transform: scale(1.1);
+}
+
+/* Header & Badges */
+.modal-header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.modal-badges {
+  margin-bottom: 1.5rem;
+}
+
+/* Romantic Quote Box */
+.modal-quote {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #e5e5e5;
+  font-style: italic;
+  border-left: 3px solid #e50914;
+  padding-left: 1rem;
+  margin-bottom: 1.8rem;
+}
+
+/* Metadata / Details List */
+.modal-details p {
+  font-size: 0.95rem;
+  color: #ddd;
+  margin-bottom: 0.6rem;
+  line-height: 1.5;
+}
+
+.detail-label {
+  color: #777;
+  font-weight: 500;
+  margin-right: 0.4rem;
+}
