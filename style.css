@@ -99,3 +99,98 @@
   font-weight: 500;
   margin-right: 0.4rem;
 }
+/* =====================================
+   MOBILE RESPONSIVE FIXES (Screens <= 768px)
+   ===================================== */
+@media (max-width: 768px) {
+  /* 1. Header & Navigation */
+  header, 
+  nav, 
+  .navbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 10px 15px !important;
+    flex-wrap: wrap !important;
+  }
+
+  /* 2. Stack the Hero / Birthday banner vertically */
+  .hero, 
+  .banner, 
+  .main-content, 
+  .content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 20px 15px !important;
+    width: 100% !important;
+  }
+
+  /* 3. Make the main photo scale nicely across the phone screen */
+  .hero img, 
+  .banner img, 
+  .main-content img,
+  .hero-image,
+  .banner-image {
+    width: 90% !important;
+    max-width: 340px !important;
+    height: auto !important;
+    border-radius: 8px !important;
+    margin: 20px auto !important;
+    display: block !important;
+  }
+
+  /* 4. Adjust typography so it fits mobile screens */
+  h1, 
+  .title, 
+  .hero h1 {
+    font-size: 26px !important;
+    line-height: 1.2 !important;
+    margin-bottom: 12px !important;
+  }
+
+  p, 
+  .description {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    padding: 0 10px !important;
+  }
+
+  /* 5. Center Play and More Info buttons */
+  .buttons, 
+  .btn-group, 
+  .actions {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+    margin-top: 15px !important;
+  }
+
+  button, 
+  .btn {
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+  }
+
+  /* 6. Netflix carousel / Memories photo rows */
+  .gallery, 
+  .row, 
+  .slider, 
+  .memories {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 10px !important;
+    padding: 10px 15px !important;
+    scroll-snap-type: x mandatory;
+  }
+
+  .gallery img, 
+  .row img, 
+  .memories img {
+    width: 160px !important;
+    height: auto !important;
+    flex-shrink: 0 !important;
+  }
+}
